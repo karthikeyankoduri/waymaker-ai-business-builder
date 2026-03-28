@@ -41,7 +41,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     });
 
     const [apiKey, setApiKeyState] = useState<string | null>(() => {
-        return 'AIzaSyAh8_RdSEei6Bf7LPJDQb_3yLmhtBtUpKQ';
+        return 'AIzaSyC8iysiKPAVY9GnloyTL1phJbGvrjs_GgE';
     });
 
     // Save changes to localStorage

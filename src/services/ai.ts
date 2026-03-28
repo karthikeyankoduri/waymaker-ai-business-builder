@@ -77,13 +77,19 @@ Return ONLY a JSON array of objects. DO NOT wrap with markdown code blocks. Sche
 export const generateWebsiteCode = async (apiKey: string, project: Project) => {
     try {
         const ai = getAIClient(apiKey);
-        const prompt = `Act as an expert frontend developer and UX designer. Design a highly converting, modern, single-page landing page for this business using HTML and Tailwind CSS CDN.
+        const prompt = `Act as an expert frontend developer and UX designer. Design a highly converting, modern, single-page landing page for this business using HTML5 and Tailwind CSS (via CDN).
 Idea: ${project.idea}
 ${project.industry ? `Industry: ${project.industry}` : ''}
 ${project.location ? `Location: ${project.location}` : ''}
 
-Return ONLY valid HTML code. Include a Hero section with a strong headline, a Features section, How it works, and a Call to Action. Use a modern, premium color palette.
-DO NOT wrap with markdown backticks natively. Return the raw HTML.`;
+IMPORTANT INSTRUCTIONS:
+1. Return ONLY valid, completely self-contained HTML5 code starting with <!DOCTYPE html>.
+2. Include the Tailwind CSS CDN script in the <head>: <script src="https://cdn.tailwindcss.com"></script>
+3. Include Google Fonts (e.g., 'Inter') and apply it to the body. Use a modern, premium color palette.
+4. Include a full structure: Navigation, Hero section with a strong headline, Features section, How it Works, and a clear Call to Action footer.
+5. Use reliable placeholder images (e.g., https://placehold.co/600x400 or generic illustrations) and responsive design (mobile-first).
+6. Add subtle hover effects, transitions, and ample whitespace.
+7. Return the raw HTML. DO NOT wrap the output in markdown code blocks (\`\`\`html) or anything else. Just the code.`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
