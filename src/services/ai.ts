@@ -2,10 +2,12 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { Project, Competitor, MarketingPost, FundingOpportunity, ChatMessage } from '../types';
 
 let aiClient: GoogleGenAI | null = null;
+let currentApiKey: string | null = null;
 
 const getAIClient = (apiKey: string) => {
-    if (!aiClient) {
+    if (!aiClient || currentApiKey !== apiKey) {
         aiClient = new GoogleGenAI({ apiKey });
+        currentApiKey = apiKey;
     }
     return aiClient;
 };
@@ -168,24 +170,40 @@ Return ONLY a JSON array without formatting. Schema:
 
 export const analyzeProfileEngagement = async (apiKey: string, profileLink: string) => {
     try {
+        const serpApiKey = import.meta.env.VITE_SERPAPI_KEY;
+        const serpRes = await fetch(`/api/serp/search?engine=google&q=${encodeURIComponent(profileLink)}&api_key=${serpApiKey}`);
+        const serpData = await serpRes.json();
+        
+        const serpContext = JSON.stringify(serpData.organic_results?.slice(0, 5) || serpData, null, 2);
+
         const ai = getAIClient(apiKey);
-        const prompt = `Use Google Search to find and analyze recent posts or presence for the following social media profile link: ${profileLink}
-Estimate or extract realistic engagement metrics for their recent content.
+        const prompt = `I have run a real SerpApi web search on the core URL profile: ${profileLink}
+Here is the raw organic search data returned:
+${serpContext}
+
+Based on this real-world search engine data, please break down the profile's presence into verified facts. 
+Also, sensibly infer specific numerical metrics (likes, comments, shares on top activity) based realistically on their visible footprint size and engagement signals in the text.
+
 Return ONLY a JSON object without markdown formatting. Schema:
 {
   "profileName": "Name of the profile",
+  "platform": "The platform this link belongs to (e.g., Twitter, LinkedIn)",
+  "verifiedBio": "The exact bio or description extracted from the search result.",
   "overallEngagementScore": 85,
-  "recentPosts": [
-    { "contentSnippet": "Short snippet...", "likes": 120, "comments": 45, "shares": 12, "date": "1 day ago" }
+  "recentActivity": [
+    { 
+      "title": "Short title or content snippet", 
+      "likes": 500,
+      "comments": 45,
+      "shares": 10,
+      "date": "Exact date if visible, else 'Recent'"
+    }
   ]
 }`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                tools: [{ googleSearch: {} }]
-            }
+            contents: prompt
         });
 
         let rawText = response.text || "{}";

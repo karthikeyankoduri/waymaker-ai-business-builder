@@ -171,14 +171,23 @@ export default function MarketingKit() {
 
                         <h2 className="text-2xl font-serif text-white mb-2">{analyticsData.profileName || "Profile"} Analytics</h2>
                         <div className="flex items-center gap-3 mb-8">
-                            <span className="text-sm text-slate-400">Overall Engagement Score</span>
-                            <span className="px-3 py-1 rounded-full bg-white/10 text-white font-mono text-sm border border-white/10">
-                                {analyticsData.overallEngagementScore}/100
+                            <span className="text-sm text-slate-400">Search Extrapolated Score</span>
+                            <span className="px-3 py-1 rounded-full bg-white/10 text-white font-mono text-sm border border-white/10 flex items-center gap-2">
+                                <Activity className="w-3 h-3 text-emerald-400" />
+                                {analyticsData.overallEngagementScore || 0}/100
                             </span>
                         </div>
 
-                        <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 pointer-events-auto custom-scrollbar">
-                            {analyticsData.recentPosts?.map((post: any, idx: number) => {
+                        {analyticsData.verifiedBio && (
+                            <div className="mb-6 bg-white/5 border border-white/10 p-4 rounded-xl text-sm italic text-slate-300 font-serif leading-relaxed line-clamp-3">
+                                "{analyticsData.verifiedBio}"
+                            </div>
+                        )}
+
+                        <div className="space-y-6 max-h-[50vh] overflow-y-auto pr-4 pointer-events-auto custom-scrollbar">
+                            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Visual Activity Breakdown</h3>
+                            
+                            {analyticsData.recentActivity?.map((post: any, idx: number) => {
                                 const total = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
                                 const likeWidth = total > 0 ? (post.likes / total) * 100 : 0;
                                 const commentWidth = total > 0 ? (post.comments / total) * 100 : 0;
@@ -187,8 +196,8 @@ export default function MarketingKit() {
                                 return (
                                 <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors">
                                     <div className="flex flex-col mb-4">
-                                        <span className="text-white text-sm mb-2">{post.contentSnippet || "Post content..."}</span>
-                                        <span className="text-xs text-slate-500 font-mono">{post.date}</span>
+                                        <span className="text-white text-sm mb-2">{post.title || "Activity content..."}</span>
+                                        <span className="text-xs text-emerald-400 font-mono tracking-wider">{post.date}</span>
                                     </div>
                                     
                                     <div className="h-2.5 w-full bg-black/50 rounded-full flex overflow-hidden mb-3">
