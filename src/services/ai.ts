@@ -166,6 +166,38 @@ Return ONLY a JSON array without formatting. Schema:
     }
 };
 
+export const analyzeProfileEngagement = async (apiKey: string, profileLink: string) => {
+    try {
+        const ai = getAIClient(apiKey);
+        const prompt = `Use Google Search to find and analyze recent posts or presence for the following social media profile link: ${profileLink}
+Estimate or extract realistic engagement metrics for their recent content.
+Return ONLY a JSON object without markdown formatting. Schema:
+{
+  "profileName": "Name of the profile",
+  "overallEngagementScore": 85,
+  "recentPosts": [
+    { "contentSnippet": "Short snippet...", "likes": 120, "comments": 45, "shares": 12, "date": "1 day ago" }
+  ]
+}`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                tools: [{ googleSearch: {} }]
+            }
+        });
+
+        let rawText = response.text || "{}";
+        rawText = rawText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
+
+        return JSON.parse(rawText);
+    } catch (error) {
+        console.error("Profile analysis error", error);
+        return null;
+    }
+};
+
 export const generateChatResponse = async (apiKey: string, project: Project, messageText: string): Promise<{ message: ChatMessage, updates?: Partial<Project> }> => {
     try {
         const ai = getAIClient(apiKey);

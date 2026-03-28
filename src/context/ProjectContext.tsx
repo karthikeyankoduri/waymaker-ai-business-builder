@@ -41,7 +41,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     });
 
     const [apiKey, setApiKeyState] = useState<string | null>(() => {
-        return 'AIzaSyC8iysiKPAVY9GnloyTL1phJbGvrjs_GgE';
+        return localStorage.getItem('waymaker_api_key') || import.meta.env.VITE_GEMINI_API_KEY || '';
     });
 
     // Save changes to localStorage

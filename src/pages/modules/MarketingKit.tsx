@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useProjects } from '../../context/ProjectContext';
-import { Megaphone, AlertCircle, Hash, Instagram, Linkedin, Twitter, Sparkles, Facebook, Webhook, CheckCircle2, Loader2, Send, Save, Rocket } from 'lucide-react';
+import { analyzeProfileEngagement } from '../../services/ai';
+import { Megaphone, AlertCircle, Hash, Instagram, Linkedin, Twitter, Sparkles, Facebook, Webhook, CheckCircle2, Loader2, Send, Save, Rocket, Activity, X, BarChart3 } from 'lucide-react';
 
 export default function MarketingKit() {
-    const { activeProject, updateProject } = useProjects();
+    const { activeProject, updateProject, apiKey } = useProjects();
 
     if (!activeProject) return null;
 
@@ -15,6 +16,32 @@ export default function MarketingKit() {
         setIsSavingWebhook(true);
         updateProject(activeProject.id, { webhookUrl: webhookInput });
         setTimeout(() => setIsSavingWebhook(false), 1500);
+    };
+
+    const [profileUrl, setProfileUrl] = useState('');
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analyticsData, setAnalyticsData] = useState<any>(null);
+
+    const handleAnalyze = async () => {
+        if (!profileUrl) {
+            alert('Please enter a profile link first.');
+            return;
+        }
+        if (!apiKey) {
+            alert('No API key found in context.');
+            return;
+        }
+        setIsAnalyzing(true);
+        try {
+            const data = await analyzeProfileEngagement(apiKey, profileUrl);
+            if (data) setAnalyticsData(data);
+            else alert("Could not fetch analytics. Please check console.");
+        } catch (error) {
+            console.error(error);
+            alert("Failed to analyze. Check console.");
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     const handleSendToWebhook = async (postIndex?: number) => {
@@ -108,6 +135,79 @@ export default function MarketingKit() {
                     {isSavingWebhook ? 'Saved!' : 'Save Webhook'}
                 </button>
             </div>
+
+            <div className="mb-8 glass-card p-4 flex flex-col md:flex-row items-center gap-4">
+                <div className="flex items-center gap-2 text-white/70">
+                    <BarChart3 className="w-5 h-5" />
+                    <span className="font-semibold whitespace-nowrap">Profile Analytics</span>
+                </div>
+                <input 
+                    type="url" 
+                    placeholder="Enter competitor or own profile link (e.g. twitter.com/username)" 
+                    value={profileUrl}
+                    onChange={(e) => setProfileUrl(e.target.value)}
+                    className="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-white/50 transition-colors text-white"
+                />
+                <button
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing}
+                    className="px-4 py-2 rounded-xl bg-white text-black hover:bg-slate-200 transition-all font-medium text-sm flex items-center gap-2 whitespace-nowrap shadow-xl"
+                >
+                    {isAnalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
+                    {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+                </button>
+            </div>
+
+            {/* Analytics Modal */}
+            {analyticsData && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                    <div className="glass-card max-w-2xl w-full p-8 relative animate-in zoom-in-95 duration-200 border border-white/20">
+                        <button 
+                            onClick={() => setAnalyticsData(null)}
+                            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <h2 className="text-2xl font-serif text-white mb-2">{analyticsData.profileName || "Profile"} Analytics</h2>
+                        <div className="flex items-center gap-3 mb-8">
+                            <span className="text-sm text-slate-400">Overall Engagement Score</span>
+                            <span className="px-3 py-1 rounded-full bg-white/10 text-white font-mono text-sm border border-white/10">
+                                {analyticsData.overallEngagementScore}/100
+                            </span>
+                        </div>
+
+                        <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 pointer-events-auto custom-scrollbar">
+                            {analyticsData.recentPosts?.map((post: any, idx: number) => {
+                                const total = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
+                                const likeWidth = total > 0 ? (post.likes / total) * 100 : 0;
+                                const commentWidth = total > 0 ? (post.comments / total) * 100 : 0;
+                                const shareWidth = total > 0 ? (post.shares / total) * 100 : 0;
+
+                                return (
+                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors">
+                                    <div className="flex flex-col mb-4">
+                                        <span className="text-white text-sm mb-2">{post.contentSnippet || "Post content..."}</span>
+                                        <span className="text-xs text-slate-500 font-mono">{post.date}</span>
+                                    </div>
+                                    
+                                    <div className="h-2.5 w-full bg-black/50 rounded-full flex overflow-hidden mb-3">
+                                        <div style={{ width: `${likeWidth}%` }} className="bg-white" title={`Likes: ${post.likes}`} />
+                                        <div style={{ width: `${commentWidth}%` }} className="bg-white/50" title={`Comments: ${post.comments}`} />
+                                        <div style={{ width: `${shareWidth}%` }} className="bg-white/20" title={`Shares: ${post.shares}`} />
+                                    </div>
+                                    
+                                    <div className="flex flex-wrap gap-4 text-xs font-mono">
+                                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-white" /> <span className="text-white font-semibold">{post.likes}</span> <span className="text-slate-500 lowercase">Likes</span></div>
+                                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-white/50" /> <span className="text-white font-semibold">{post.comments}</span> <span className="text-slate-500 lowercase">Comments</span></div>
+                                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-white/20" /> <span className="text-white font-semibold">{post.shares}</span> <span className="text-slate-500 lowercase">Shares</span></div>
+                                    </div>
+                                </div>
+                            )})}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {(!activeProject.marketingKit || activeProject.marketingKit.length === 0) ? (
                 <div className="glass-card p-12 text-center flex flex-col items-center border-dashed border-white/20">
