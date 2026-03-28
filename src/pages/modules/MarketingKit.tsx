@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
 import { useProjects } from '../../context/ProjectContext';
-import { Megaphone, AlertCircle, Hash, Instagram, Linkedin, Twitter, Sparkles, Facebook, Webhook, CheckCircle2, Loader2, Send } from 'lucide-react';
+import { Megaphone, AlertCircle, Hash, Instagram, Linkedin, Twitter, Sparkles, Facebook, Webhook, CheckCircle2, Loader2, Send, Save, Rocket } from 'lucide-react';
 
 export default function MarketingKit() {
-    const { activeProject } = useProjects();
+    const { activeProject, updateProject } = useProjects();
 
     if (!activeProject) return null;
 
     const [sendingState, setSendingState] = useState<{ id: string | number, status: 'idle' | 'loading' | 'success' | 'error' }>({ id: '', status: 'idle' });
+    const [webhookInput, setWebhookInput] = useState(activeProject.webhookUrl || '');
+    const [isSavingWebhook, setIsSavingWebhook] = useState(false);
+
+    const handleSaveWebhook = () => {
+        setIsSavingWebhook(true);
+        updateProject(activeProject.id, { webhookUrl: webhookInput });
+        setTimeout(() => setIsSavingWebhook(false), 1500);
+    };
 
     const handleSendToWebhook = async (postIndex?: number) => {
-        if (!activeProject.webhookUrl) {
-            alert('Please configure a Webhook URL in the Deployments tab first.');
+        const urlToUse = webhookInput || activeProject.webhookUrl;
+        if (!urlToUse) {
+            alert('Please configure a Webhook URL first.');
             return;
         }
 
@@ -23,7 +32,7 @@ export default function MarketingKit() {
                 ? { type: 'individual', payload: activeProject.marketingKit![postIndex] }
                 : { type: 'bulk', payload: activeProject.marketingKit };
 
-            const response = await fetch(activeProject.webhookUrl, {
+            const response = await fetch(urlToUse, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,11 +80,33 @@ export default function MarketingKit() {
                         ) : sendingState.id === 'bulk' && sendingState.status === 'success' ? (
                             <CheckCircle2 className="w-4 h-4" />
                         ) : (
-                            <Webhook className="w-4 h-4" />
+                            <Rocket className="w-4 h-4" />
                         )}
-                        {sendingState.id === 'bulk' && sendingState.status === 'success' ? 'Sent All' : 'Send All to Webhook'}
+                        {sendingState.id === 'bulk' && sendingState.status === 'success' ? 'Deployed All' : 'Deploy All'}
                     </button>
                 )}
+            </div>
+
+            <div className="mb-8 glass-card p-4 flex flex-col md:flex-row items-center gap-4">
+                <div className="flex items-center gap-2 text-emerald-400">
+                    <Webhook className="w-5 h-5" />
+                    <span className="font-semibold whitespace-nowrap">Webhook URL</span>
+                </div>
+                <input 
+                    type="url" 
+                    placeholder="Enter your n8n or Make webhook URL..." 
+                    value={webhookInput}
+                    onChange={(e) => setWebhookInput(e.target.value)}
+                    className="flex-1 bg-slate-900/50 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500/50 transition-colors text-white"
+                />
+                <button
+                    onClick={handleSaveWebhook}
+                    disabled={isSavingWebhook}
+                    className="px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all font-medium text-sm flex items-center gap-2 whitespace-nowrap"
+                >
+                    {isSavingWebhook ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                    {isSavingWebhook ? 'Saved!' : 'Save Webhook'}
+                </button>
             </div>
 
             {(!activeProject.marketingKit || activeProject.marketingKit.length === 0) ? (
@@ -128,9 +159,9 @@ export default function MarketingKit() {
                                     ) : sendingState.id === i && sendingState.status === 'success' ? (
                                         <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                                     ) : (
-                                        <Send className="w-4 h-4" />
+                                        <Rocket className="w-4 h-4" />
                                     )}
-                                    {sendingState.id === i && sendingState.status === 'success' ? 'Sent' : 'Send Post'}
+                                    {sendingState.id === i && sendingState.status === 'success' ? 'Deployed' : 'Deploy Post'}
                                 </button>
                             </div>
                         );
