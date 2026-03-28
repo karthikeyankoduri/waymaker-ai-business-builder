@@ -60,9 +60,6 @@ export default function Sidebar() {
                             <NavLink to="/dashboard/research" className={navItemClass}>
                                 <Target className="w-4 h-4" /> Market Research
                             </NavLink>
-                            <NavLink to="/dashboard/competitors" className={navItemClass}>
-                                <Target className="w-4 h-4" /> Competitors
-                            </NavLink>
                             <NavLink to="/dashboard/website" className={navItemClass}>
                                 <LayoutTemplate className="w-4 h-4" /> Website Gen
                             </NavLink>

@@ -20,18 +20,50 @@ const handleAIError = (error: any) => {
 export const generateMarketResearch = async (apiKey: string, project: Project) => {
     try {
         const ai = getAIClient(apiKey);
-        const prompt = `Act as an expert business consultant. Generate a market research report for a new business idea.
+        const prompt = `Act as a top-tier startup consultant. Generate a highly detailed, data-driven market research dashboard for this business idea.
 Idea: ${project.idea}
 ${project.industry ? `Industry: ${project.industry}` : ''}
 ${project.targetAudience ? `Target Audience: ${project.targetAudience}` : ''}
 ${project.location ? `Location: ${project.location}` : ''}
 
-Return ONLY a JSON object. DO NOT wrap with markdown code blocks. Schema:
+CRITICAL: Return ONLY a valid JSON object. Do not wrap in markdown blocks. Schema:
 {
-  "executiveSummary": "A brief overall summary of the business idea and market.",
-  "marketInsights": ["insight point 1 (can include basic markdown formatting like bold)", "insight point 2"],
-  "industryTrends": ["trend point 1", "trend point 2"],
-  "keyOpportunities": ["opportunity 1", "opportunity 2"]
+  "marketAnalysis": {
+    "tam": { "value": "$XXB", "label": "Total Addressable Market", "description": "Short explanation of this market (e.g. Global Tech)" },
+    "sam": { "value": "$XXM", "label": "Serviceable Addressable Market", "description": "Short explanation of SAM (e.g. US B2B Software)" },
+    "som": { "value": "$XXM", "label": "Serviceable Obtainable Market", "description": "Short explanation of SOM (e.g. Projected year 3 capture)" },
+    "topDownApproach": [
+      { "label": "Global/National Market", "value": "$XXB" },
+      { "label": "Segment Market", "value": "$XXB" },
+      { "label": "Niche Market", "value": "$XXM" },
+      { "label": "Direct Addressable", "value": "$XXM" }
+    ]
+  },
+  "positionInMarket": {
+    "xAxis": { "left": "Low Quality", "right": "High Quality" },
+    "yAxis": { "top": "High Price", "bottom": "Low Price" },
+    "pyramid": [
+      { "level": "Top Product", "description": "High Value, Convenient" },
+      { "level": "Alternatives", "description": "Convenient but Flawed" },
+      { "level": "Raw Forms", "description": "Natural but Inconvenient" }
+    ],
+    "quadrants": {
+      "topLeft": { "name": "Cowboy / Overpriced", "competitors": ["Comp A"] },
+      "topRight": { "name": "Premium Products", "competitors": ["Our Brand", "Comp B"] },
+      "bottomLeft": { "name": "Economy Products", "competitors": ["Comp C"] },
+      "bottomRight": { "name": "Bargain / Value", "competitors": ["Comp D"] }
+    }
+  },
+  "competitiveLandscape": [
+    { 
+      "brand": "Competitor 1", 
+      "fundingStatus": "Corporate Backed", 
+      "coreFocus": "Frozen Snacks", 
+      "consumerFriction": "High (Fry / Heat)", 
+      "formatAndStorage": "-18°C" 
+    }
+  ],
+  "keyOpportunities": ["Actionable clear opportunity 1", "Opportunity 2"]
 }`;
 
         const response = await ai.models.generateContent({
@@ -112,10 +144,15 @@ IMPORTANT INSTRUCTIONS:
 export const generateMarketingKit = async (apiKey: string, project: Project): Promise<MarketingPost[]> => {
     try {
         const ai = getAIClient(apiKey);
-        const prompt = `Act as an expert social media manager. Generate 4 social media posts (Instagram, LinkedIn, Twitter, Facebook) to launch this business.
+const prompt = `Act as an expert social media manager. Generate 4 exceptional, premium social media posts (Instagram, LinkedIn, Twitter, Facebook) to launch this business.
 Idea: ${project.idea}
 ${project.targetAudience ? `Target Audience: ${project.targetAudience}` : ''}
 ${project.location ? `Location: ${project.location}` : ''}
+${project.competitors && project.competitors.length > 0 ? `
+Competitor Intelligence Context: 
+We are displacing these rivals:
+${project.competitors.map(c => `- ${c.name} (Weakness to exploit: ${c.weaknesses?.join(', ') || c.gap || 'unknown'})`).join('\n')}
+Design the marketing copy to implicitly highlight how our brand bridges the exact market gaps left by these competitors without naming them natively.` : ''}
 
 Return ONLY a JSON array without markdown formatting. Schema:
 [
@@ -213,6 +250,54 @@ Return ONLY a JSON object without markdown formatting. Schema:
     } catch (error) {
         console.error("Profile analysis error", error);
         return null;
+    }
+};
+
+export const analyzeCompetitorInstagrams = async (apiKey: string, competitors: Competitor[]) => {
+    try {
+        const serpApiKey = import.meta.env.VITE_SERPAPI_KEY;
+        const allContexts = [];
+        const topCompetitors = competitors.slice(0, 3);
+        
+        for (const comp of topCompetitors) {
+           const res = await fetch(`/api/serp/search?engine=google&q=${encodeURIComponent('site:instagram.com ' + comp.name)}&api_key=${serpApiKey}`);
+           const data = await res.json();
+           allContexts.push({
+              competitor: comp.name,
+              organic_results: data.organic_results?.slice(0, 3) || []
+           });
+        }
+
+        const ai = getAIClient(apiKey);
+        const prompt = `I have run a precision SerpApi web search for the Instagram presence of these competitors:
+${JSON.stringify(allContexts, null, 2)}
+
+Analyze their organic footprint. Extrapolate an accurate Instagram engagement report (likes, comments, and an overall 'Engagement Score' out of 100) strictly based on their visible search snippet clout.
+
+Return ONLY a JSON array without markdown formatting. Schema:
+[
+  {
+    "competitorName": "Name",
+    "handle": "@handle_found",
+    "engagementScore": 85,
+    "avgLikes": 1200,
+    "avgComments": 150,
+    "followersEstimate": "50K+"
+  }
+]`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt
+        });
+
+        let rawText = response.text || "[]";
+        rawText = rawText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
+
+        return JSON.parse(rawText);
+    } catch (error) {
+        console.error("Competitor analysis error", error);
+        return [];
     }
 };
 

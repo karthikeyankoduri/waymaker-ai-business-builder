@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useProjects } from '../../context/ProjectContext';
-import { analyzeProfileEngagement } from '../../services/ai';
-import { Megaphone, AlertCircle, Hash, Instagram, Linkedin, Twitter, Sparkles, Facebook, Webhook, CheckCircle2, Loader2, Send, Save, Rocket, Activity, X, BarChart3 } from 'lucide-react';
+import { analyzeCompetitorInstagrams } from '../../services/ai';
+import { Megaphone, AlertCircle, Hash, Instagram, Linkedin, Twitter, Sparkles, Facebook, Webhook, CheckCircle2, Loader2, Send, Save, Rocket, Activity, X, BarChart3, Users } from 'lucide-react';
 
 export default function MarketingKit() {
     const { activeProject, updateProject, apiKey } = useProjects();
@@ -18,29 +18,27 @@ export default function MarketingKit() {
         setTimeout(() => setIsSavingWebhook(false), 1500);
     };
 
-    const [profileUrl, setProfileUrl] = useState('');
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [analyticsData, setAnalyticsData] = useState<any>(null);
+    const [isAnalyzingCompetitors, setIsAnalyzingCompetitors] = useState(false);
+    const [competitorAnalytics, setCompetitorAnalytics] = useState<any[] | null>(null);
 
-    const handleAnalyze = async () => {
-        if (!profileUrl) {
-            alert('Please enter a profile link first.');
-            return;
-        }
+    const handleAnalyzeCompetitors = async () => {
         if (!apiKey) {
-            alert('No API key found in context.');
+            alert('No API key found.');
             return;
         }
-        setIsAnalyzing(true);
+        if (!activeProject.competitors?.length) {
+            alert('Generate Competitors/Market Research first before running intelligence scans.');
+            return;
+        }
+        setIsAnalyzingCompetitors(true);
         try {
-            const data = await analyzeProfileEngagement(apiKey, profileUrl);
-            if (data) setAnalyticsData(data);
-            else alert("Could not fetch analytics. Please check console.");
+            const data = await analyzeCompetitorInstagrams(apiKey, activeProject.competitors);
+            setCompetitorAnalytics(data);
         } catch (error) {
             console.error(error);
-            alert("Failed to analyze. Check console.");
+            alert('Failed to analyze competitor analytics.');
         } finally {
-            setIsAnalyzing(false);
+            setIsAnalyzingCompetitors(false);
         }
     };
 
@@ -136,88 +134,6 @@ export default function MarketingKit() {
                 </button>
             </div>
 
-            <div className="mb-8 glass-card p-4 flex flex-col md:flex-row items-center gap-4">
-                <div className="flex items-center gap-2 text-white/70">
-                    <BarChart3 className="w-5 h-5" />
-                    <span className="font-semibold whitespace-nowrap">Profile Analytics</span>
-                </div>
-                <input 
-                    type="url" 
-                    placeholder="Enter competitor or own profile link (e.g. twitter.com/username)" 
-                    value={profileUrl}
-                    onChange={(e) => setProfileUrl(e.target.value)}
-                    className="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-white/50 transition-colors text-white"
-                />
-                <button
-                    onClick={handleAnalyze}
-                    disabled={isAnalyzing}
-                    className="px-4 py-2 rounded-xl bg-white text-black hover:bg-slate-200 transition-all font-medium text-sm flex items-center gap-2 whitespace-nowrap shadow-xl"
-                >
-                    {isAnalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
-                    {isAnalyzing ? 'Analyzing...' : 'Analyze'}
-                </button>
-            </div>
-
-            {/* Analytics Modal */}
-            {analyticsData && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                    <div className="glass-card max-w-2xl w-full p-8 relative animate-in zoom-in-95 duration-200 border border-white/20">
-                        <button 
-                            onClick={() => setAnalyticsData(null)}
-                            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white transition-colors"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-
-                        <h2 className="text-2xl font-serif text-white mb-2">{analyticsData.profileName || "Profile"} Analytics</h2>
-                        <div className="flex items-center gap-3 mb-8">
-                            <span className="text-sm text-slate-400">Search Extrapolated Score</span>
-                            <span className="px-3 py-1 rounded-full bg-white/10 text-white font-mono text-sm border border-white/10 flex items-center gap-2">
-                                <Activity className="w-3 h-3 text-emerald-400" />
-                                {analyticsData.overallEngagementScore || 0}/100
-                            </span>
-                        </div>
-
-                        {analyticsData.verifiedBio && (
-                            <div className="mb-6 bg-white/5 border border-white/10 p-4 rounded-xl text-sm italic text-slate-300 font-serif leading-relaxed line-clamp-3">
-                                "{analyticsData.verifiedBio}"
-                            </div>
-                        )}
-
-                        <div className="space-y-6 max-h-[50vh] overflow-y-auto pr-4 pointer-events-auto custom-scrollbar">
-                            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Visual Activity Breakdown</h3>
-                            
-                            {analyticsData.recentActivity?.map((post: any, idx: number) => {
-                                const total = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
-                                const likeWidth = total > 0 ? (post.likes / total) * 100 : 0;
-                                const commentWidth = total > 0 ? (post.comments / total) * 100 : 0;
-                                const shareWidth = total > 0 ? (post.shares / total) * 100 : 0;
-
-                                return (
-                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors">
-                                    <div className="flex flex-col mb-4">
-                                        <span className="text-white text-sm mb-2">{post.title || "Activity content..."}</span>
-                                        <span className="text-xs text-emerald-400 font-mono tracking-wider">{post.date}</span>
-                                    </div>
-                                    
-                                    <div className="h-2.5 w-full bg-black/50 rounded-full flex overflow-hidden mb-3">
-                                        <div style={{ width: `${likeWidth}%` }} className="bg-white" title={`Likes: ${post.likes}`} />
-                                        <div style={{ width: `${commentWidth}%` }} className="bg-white/50" title={`Comments: ${post.comments}`} />
-                                        <div style={{ width: `${shareWidth}%` }} className="bg-white/20" title={`Shares: ${post.shares}`} />
-                                    </div>
-                                    
-                                    <div className="flex flex-wrap gap-4 text-xs font-mono">
-                                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-white" /> <span className="text-white font-semibold">{post.likes}</span> <span className="text-slate-500 lowercase">Likes</span></div>
-                                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-white/50" /> <span className="text-white font-semibold">{post.comments}</span> <span className="text-slate-500 lowercase">Comments</span></div>
-                                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-white/20" /> <span className="text-white font-semibold">{post.shares}</span> <span className="text-slate-500 lowercase">Shares</span></div>
-                                    </div>
-                                </div>
-                            )})}
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {(!activeProject.marketingKit || activeProject.marketingKit.length === 0) ? (
                 <div className="glass-card p-12 text-center flex flex-col items-center border-dashed border-white/20">
                     <AlertCircle className="w-12 h-12 text-slate-500 mb-4" />
@@ -225,8 +141,106 @@ export default function MarketingKit() {
                     <p className="text-slate-400">Go to the Overview tab to run the AI Orchestrator for this project.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                    {activeProject.marketingKit.map((post, i) => {
+                <div className="space-y-8">
+                    {/* Competitor Intelligence Matrix */}
+                    {activeProject.competitors && activeProject.competitors.length > 0 && (
+                        <div className="glass-card p-6 md:p-10 border border-white/10">
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-8 border-b border-white/10">
+                                <div>
+                                    <h2 className="text-2xl font-serif text-white mb-2 flex items-center gap-3">
+                                        <Users className="w-6 h-6 text-pink-500" />
+                                        Competitor Instagram Intelligence
+                                    </h2>
+                                    <p className="text-slate-400 text-sm">Automated SerpAPI ingestion visualizing your top competitors organic Instagram momentum.</p>
+                                </div>
+                                <button
+                                    onClick={handleAnalyzeCompetitors}
+                                    disabled={isAnalyzingCompetitors}
+                                    className="mt-4 md:mt-0 px-6 py-3 rounded-xl bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 border border-pink-500/20 transition-all font-serif font-bold tracking-wide shadow-[0_0_20px_rgba(236,72,153,0.1)] flex items-center gap-2"
+                                >
+                                    {isAnalyzingCompetitors ? <Loader2 className="w-5 h-5 animate-spin" /> : <Instagram className="w-5 h-5" />}
+                                    {isAnalyzingCompetitors ? 'Scraping Networks...' : 'Fetch Competitor Analytics'}
+                                </button>
+                            </div>
+
+                            {competitorAnalytics && competitorAnalytics.length > 0 && (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                                    {/* Engagement Score Graph */}
+                                    <div>
+                                        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-6">Overall Visibility Score</h3>
+                                        <div className="space-y-6">
+                                            {competitorAnalytics.map((comp, idx) => (
+                                                <div key={idx}>
+                                                    <div className="flex justify-between text-sm mb-2">
+                                                        <span className="text-white font-medium">{comp.competitorName} <span className="text-slate-500 font-mono text-xs ml-2">{comp.handle}</span></span>
+                                                        <span className="text-emerald-400 font-mono">{comp.engagementScore}/100</span>
+                                                    </div>
+                                                    <div className="h-3 w-full bg-black/50 rounded-full overflow-hidden">
+                                                        <div 
+                                                            style={{ width: `${comp.engagementScore}%` }} 
+                                                            className="h-full bg-gradient-to-r from-emerald-500/50 to-emerald-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)] transition-all duration-1000" 
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Raw Data Breakdown */}
+                                    <div>
+                                        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-6">Actionable Medians</h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {competitorAnalytics.map((comp, idx) => (
+                                                <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:border-pink-500/30 transition-colors">
+                                                    <h4 className="text-white font-serif font-bold mb-4">{comp.competitorName}</h4>
+                                                    
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                                                <span>Est. Followers</span>
+                                                                <span className="text-white font-mono">{comp.followersEstimate}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                                                <span>Avg Likes / Post</span>
+                                                                <span className="text-pink-400 font-mono">{comp.avgLikes}</span>
+                                                            </div>
+                                                            <div className="h-1.5 w-full bg-black/50 rounded-full overflow-hidden">
+                                                                <div style={{ width: `${Math.min(100, (comp.avgLikes / 2000) * 100)}%` }} className="h-full bg-pink-500" />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                                                <span>Avg Comments</span>
+                                                                <span className="text-blue-400 font-mono">{comp.avgComments}</span>
+                                                            </div>
+                                                            <div className="h-1.5 w-full bg-black/50 rounded-full overflow-hidden">
+                                                                <div style={{ width: `${Math.min(100, (comp.avgComments / 200) * 100)}%` }} className="h-full bg-blue-500" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Marketing Kit Unlock State */}
+                    {activeProject.competitors && activeProject.competitors.length > 0 && (!competitorAnalytics || competitorAnalytics.length === 0) && (
+                        <div className="glass-card p-12 text-center flex flex-col items-center border-dashed border-white/20 mt-8">
+                            <Sparkles className="w-12 h-12 text-pink-500 mb-4 animate-pulse" />
+                            <h3 className="text-xl font-bold mb-2">Unlock Your Marketing Posts</h3>
+                            <p className="text-slate-400 max-w-lg">Please click "Fetch Competitor Analytics" above to ingest market gaps and securely unlock your localized generated brand posts.</p>
+                        </div>
+                    )}
+
+                    {(!activeProject.competitors || activeProject.competitors.length === 0 || (competitorAnalytics && competitorAnalytics.length > 0)) && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                        {activeProject.marketingKit.map((post, i) => {
                         const style = platforms[post.platform as keyof typeof platforms] || platforms.Twitter;
                         const Icon = style.icon;
 
@@ -275,6 +289,8 @@ export default function MarketingKit() {
                             </div>
                         );
                     })}
+                        </div>
+                    )}
                 </div>
             )}
         </div>
