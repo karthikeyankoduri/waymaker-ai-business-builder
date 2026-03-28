@@ -1,262 +1,137 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Rocket, Sparkles, Zap, BrainCircuit, ArrowRight, CheckCircle2, Layers, LineChart, Target, LayoutTemplate, Megaphone, Coins } from 'lucide-react';
+import { ArrowRight, MoveRight, CornerRightDown } from 'lucide-react';
 
 export default function Landing() {
     const navigate = useNavigate();
 
     return (
-        <div className="relative min-h-screen overflow-hidden">
-            {/* Background gradients */}
-            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[150px] pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[120px] pointer-events-none" />
+        <div className="relative min-h-screen flex flex-col items-center justify-between p-6 overflow-hidden">
+            {/* Background glowing mesh representation (Ascend style) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-white/5 opacity-50 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-white/5 opacity-70 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-white/10 opacity-90 pointer-events-none" style={{ boxShadow: 'inset 0 0 100px rgba(255,255,255,0.05)' }} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                {/* Nav */}
-                <nav className="flex items-center justify-between py-6">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 neon-border">
-                            <Sparkles className="w-6 h-6 text-primary" />
-                        </div>
-                        <span className="text-2xl font-bold tracking-tight">Waymaker</span>
+            {/* Glowing spotlight coming from top like Ascend */}
+            <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-white opacity-[0.03] blur-[150px] pointer-events-none rounded-[100%]" />
+
+            <div className="w-full max-w-7xl mx-auto flex flex-col flex-1 relative z-10">
+                
+                {/* Navigation Menu */}
+                <nav className="flex items-center justify-between w-full py-4 relative z-20">
+                    {/* Logo */}
+                    <div className="flex-1">
+                        <span className="text-xl md:text-2xl font-serif text-white tracking-tight">Waymaker.</span>
                     </div>
-                    <button
-                        onClick={() => navigate('/dashboard')}
-                        className="px-6 py-2 rounded-full glass-panel hover:bg-white/10 transition-colors font-medium text-sm flex items-center gap-2"
-                    >
-                        Go to Dashboard <ArrowRight className="w-4 h-4" />
-                    </button>
+
+                    {/* Center Pill */}
+                    <div className="hidden md:flex flex-1 justify-center">
+                        <div className="flex items-center gap-6 px-6 py-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-sm font-medium text-slate-300">
+                            <button className="hover:text-white transition-colors">About</button>
+                            <button className="hover:text-white transition-colors">Features</button>
+                            <button className="hover:text-white transition-colors">Contact</button>
+                        </div>
+                    </div>
+
+                    {/* Right Button */}
+                    <div className="flex-1 flex justify-end">
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="bg-white text-black px-4 md:px-5 py-2 md:py-2.5 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-slate-200 transition-colors"
+                        >
+                            Go to App 
+                            <span className="bg-black text-white w-5 h-5 rounded-full flex items-center justify-center">
+                                <ArrowRight className="w-3 h-3" />
+                            </span>
+                        </button>
+                    </div>
                 </nav>
 
-                {/* Hero */}
-                <main className="mt-20 lg:mt-32 text-center flex flex-col items-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel mb-8 border-primary/30 text-primary"
-                    >
-                        <Sparkles className="w-4 h-4" />
-                        <span className="text-sm font-semibold tracking-wide uppercase">Powered by Google Gemini 2.5 Flash</span>
-                    </motion.div>
-
+                {/* Hero Section */}
+                <main className="flex-1 flex flex-col items-center justify-center text-center mt-12 md:mt-24 mb-32 z-20">
                     <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.1 }}
-                        className="text-5xl md:text-7xl font-bold tracking-tight mb-8 max-w-4xl leading-tight"
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                        className="font-serif text-[3.5rem] sm:text-[5rem] md:text-[6.5rem] lg:text-[7.5rem] leading-[1.05] tracking-tight max-w-[85rem] text-white"
+                        style={{ textShadow: '0 4px 40px rgba(0,0,0,0.5)' }}
                     >
-                        Turn raw ideas into <br />
-                        <span className="text-gradient">Ready-to-Launch</span> Businesses
+                        Powering the <em className="italic font-light opacity-90">next generation</em> of autonomous businesses.
                     </motion.h1>
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-xl text-slate-400 mb-12 max-w-2xl leading-relaxed"
+                        transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+                        className="mt-12 flex flex-col sm:flex-row items-center gap-4"
                     >
-                        Instantly generate market research, competitor analysis, landing pages, and marketing campaigns—autonomously.
-                    </motion.p>
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="bg-white text-black px-6 py-3.5 rounded-full text-[15px] font-medium flex items-center gap-3 hover:bg-slate-200 transition-colors shadow-xl"
+                        >
+                            Start Building
+                            <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center">
+                                <ArrowRight className="w-3.5 h-3.5" />
+                            </span>
+                        </button>
 
-                    <motion.button
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => navigate('/dashboard')}
-                        className="group relative px-8 py-4 rounded-full bg-slate-100 text-slate-950 font-bold text-lg overflow-hidden shadow-[0_0_40px_rgba(6,182,212,0.4)] transition-all"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div className="flex items-center gap-2 relative z-10 group-hover:text-white transition-colors duration-300">
-                            Start Building <Rocket className="w-5 h-5 ml-2" />
-                        </div>
-                    </motion.button>
+                        <button
+                            className="bg-black/40 backdrop-blur-md border border-white/10 text-white px-6 py-3.5 rounded-full text-[15px] font-medium hover:bg-white/10 transition-colors shadow-xl"
+                        >
+                            Learn More
+                        </button>
+                    </motion.div>
                 </main>
 
-                {/* Features */}
-                <section className="mt-40 pb-20">
-                    <motion.div
+                {/* Footer Section equivalent holding bottom text alignments */}
+                <div className="w-full flex flex-col md:flex-row items-end justify-between mt-auto pt-8 pb-4 relative z-20">
+                    <motion.div 
                         initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        className="text-center mb-16"
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1, duration: 1 }}
+                        className="flex items-center gap-2 text-slate-400 text-sm md:mb-0 mb-6 font-medium"
                     >
-                        <h2 className="text-3xl font-bold mb-4">An Autonomous AI Team</h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto">Waymaker orchestrates multiple AI models to handle every aspect of your launch.</p>
+                        <span className="text-slate-500">/</span> Scroll down
+                        <CornerRightDown className="w-3.5 h-3.5 ml-1 opacity-50" />
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[
-                            {
-                                icon: LineChart,
-                                title: "Market Research",
-                                desc: "Deep dive into market size, target audience demographics, and industry trends."
-                            },
-                            {
-                                icon: Target,
-                                title: "Competitor Analysis",
-                                desc: "Identify key players, analyze their strengths, and find tactical gaps where your business can win."
-                            },
-                            {
-                                icon: LayoutTemplate,
-                                title: "Website Builder",
-                                desc: "Get a fully-coded, high-converting Tailwind CSS website generated and previewed in seconds."
-                            },
-                            {
-                                icon: Megaphone,
-                                title: "Marketing Kit",
-                                desc: "Automate social media copy, content calendars, and brand messaging strategies instantly."
-                            },
-                            {
-                                icon: Coins,
-                                title: "Funding Matcher",
-                                desc: "Find live grants, investors, pitch competitions, and events tailored exactly to your industry."
-                            }
-                        ].map((feature, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.2 }}
-                                className="glass-card p-8 group hover:-translate-y-2 transition-transform duration-300"
-                            >
-                                <div className="w-12 h-12 rounded-lg bg-slate-800/50 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                                    <feature.icon className="w-6 h-6 text-primary" />
-                                </div>
-                                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                                <p className="text-slate-400 leading-relaxed text-sm">{feature.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Flowchart Section */}
-                <section className="py-20 border-t border-white/5 relative">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-
-                    <motion.div
+                    <motion.p
                         initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        className="text-center mb-16 relative z-10"
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8, duration: 1 }}
+                        className="text-right text-slate-300 md:max-w-md text-sm md:text-[15px] leading-relaxed font-sans font-normal"
                     >
-                        <h2 className="text-3xl md:text-5xl font-bold mb-4">How Waymaker Works</h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto">From a single sentence to a fully deployed business in 4 simple steps.</p>
-                    </motion.div>
-
-                    <div className="max-w-4xl mx-auto relative z-10">
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative">
-                            {/* Connecting Line (Desktop) */}
-                            <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-primary/20 via-secondary/50 to-primary/20 -z-10" />
-
-                            {[
-                                { step: "1", title: "Share Idea", icon: BrainCircuit, desc: "Tell us your business concept or industry." },
-                                { step: "2", title: "AI Analysis", icon: Zap, desc: "Deep market, competitor & audience research." },
-                                { step: "3", title: "Generate Assets", icon: Layers, desc: "Auto-build landing pages & marketing kits." },
-                                { step: "4", title: "Launch & Fund", icon: Rocket, desc: "Deploy to web and match with investors." }
-                            ].map((item, i) => (
-                                <React.Fragment key={i}>
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ delay: i * 0.2 }}
-                                        className="flex flex-col items-center text-center w-full md:w-1/4 relative group"
-                                    >
-                                        <div className="w-16 h-16 rounded-full glass-panel border border-primary/30 flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_20px_rgba(6,182,212,0.2)] bg-slate-900 group-hover:bg-primary/20 group-hover:border-primary/50">
-                                            <span className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-secondary text-white text-xs font-bold flex items-center justify-center shadow-lg">{item.step}</span>
-                                            <item.icon className="w-7 h-7 text-primary group-hover:text-white transition-colors" />
-                                        </div>
-                                        <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                                        <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
-                                    </motion.div>
-                                    {/* Mobile connector */}
-                                    {i < 3 && (
-                                        <div className="md:hidden h-8 w-0.5 bg-gradient-to-b from-primary/50 to-transparent my-2" />
-                                    )}
-                                </React.Fragment>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Pricing Section */}
-                <section className="py-20 mb-20">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        className="text-center mb-16"
-                    >
-                        <h2 className="text-3xl md:text-5xl font-bold mb-4">Simple, Transparent Pricing</h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto">Choose the plan that fits your ambition.</p>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        {[
-                            {
-                                name: "Starter",
-                                price: "Free",
-                                duration: "forever",
-                                desc: "Perfect for exploring ideas.",
-                                features: ["3 Projects per month", "Basic Market Research", "Standard Website Generation", "Community Support"],
-                                highlight: false
-                            },
-                            {
-                                name: "Pro",
-                                price: "$29",
-                                duration: "per month",
-                                desc: "For serious entrepreneurs.",
-                                features: ["Unlimited Projects", "Deep Competitor Analysis", "Premium Landing Pages", "Funding Matcher", "Priority Support"],
-                                highlight: true
-                            },
-                            {
-                                name: "Enterprise",
-                                price: "$99",
-                                duration: "per month",
-                                desc: "Full agency capabilities.",
-                                features: ["Everything in Pro", "Custom AI Workflows", "White-label Exports", "API Access", "Dedicated Account Manager"],
-                                highlight: false
-                            }
-                        ].map((plan, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.2 }}
-                                className={`glass-card p-8 rounded-xl border relative overflow-hidden transition-all duration-300 ${plan.highlight ? 'border-primary/50 shadow-[0_0_30px_rgba(6,182,212,0.2)] md:-translate-y-4' : 'border-white/5 hover:border-white/20 hover:-translate-y-1'}`}
-                            >
-                                {plan.highlight && (
-                                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary to-secondary" />
-                                )}
-                                <div className="mb-8">
-                                    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                                    <p className="text-sm text-slate-400 mb-6">{plan.desc}</p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-4xl font-extrabold">{plan.price}</span>
-                                        {plan.price !== 'Free' && <span className="text-slate-400">/{plan.duration}</span>}
-                                    </div>
-                                </div>
-                                <ul className="space-y-4 mb-8">
-                                    {plan.features.map((feature, fIdx) => (
-                                        <li key={fIdx} className="flex items-start gap-3">
-                                            <CheckCircle2 className={`w-5 h-5 shrink-0 ${plan.highlight ? 'text-primary' : 'text-slate-500'}`} />
-                                            <span className="text-sm text-slate-300">{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <button className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${plan.highlight ? 'bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 shadow-lg' : 'glass-panel hover:bg-white/10'}`}>
-                                    {plan.price === 'Free' ? 'Get Started' : 'Upgrade Plan'}
-                                </button>
-                            </motion.div>
-                        ))}
-                    </div>
-                </section>
+                        We help entrepreneurs, creators, and visionaries grow through autonomous market research, reactive web design, and algorithmic marketing strategy.
+                    </motion.p>
+                </div>
+            </div>
+            
+            {/* The rest of the page gets very minimalistic if they scroll down */}
+            <div className="w-full max-w-7xl mx-auto py-32 z-20 hidden md:block border-t border-white/5 mt-20">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                     {/* Simplified elegant features */}
+                     <div className="border-t border-white/20 pt-6">
+                         <span className="text-xs text-slate-500 block mb-4 uppercase tracking-wider font-semibold">01 / Research</span>
+                         <h3 className="font-serif text-2xl mb-4 text-white">Intelligent Market Analysis</h3>
+                         <p className="text-sm text-slate-400 leading-relaxed">Understand audiences and locate highly profitable niches without lifting a finger.</p>
+                     </div>
+                     <div className="border-t border-white/20 pt-6">
+                         <span className="text-xs text-slate-500 block mb-4 uppercase tracking-wider font-semibold">02 / Design</span>
+                         <h3 className="font-serif text-2xl mb-4 text-white">Generative CSS Architecture</h3>
+                         <p className="text-sm text-slate-400 leading-relaxed">Turn high level prompts into fully functional, accessible, and responsive websites.</p>
+                     </div>
+                     <div className="border-t border-white/20 pt-6">
+                         <span className="text-xs text-slate-500 block mb-4 uppercase tracking-wider font-semibold">03 / Market</span>
+                         <h3 className="font-serif text-2xl mb-4 text-white">Hyper-targeted Campaigns</h3>
+                         <p className="text-sm text-slate-400 leading-relaxed">Automatically write, structure, and deploy social media packages tailored to your brand.</p>
+                     </div>
+                     <div className="border-t border-white/20 pt-6">
+                         <span className="text-xs text-slate-500 block mb-4 uppercase tracking-wider font-semibold">04 / Capital</span>
+                         <h3 className="font-serif text-2xl mb-4 text-white">Funding Synchronization</h3>
+                         <p className="text-sm text-slate-400 leading-relaxed">Cross-index your idea against active grants, investors, and startup accelerators.</p>
+                     </div>
+                </div>
             </div>
         </div>
     );

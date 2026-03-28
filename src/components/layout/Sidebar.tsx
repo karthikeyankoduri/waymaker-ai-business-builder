@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useProjects } from '../../context/ProjectContext';
-import { Sparkles, Plus, Briefcase, LayoutTemplate, MessageSquare, Folders, Settings, Megaphone, Target, DollarSign, Trash2 } from 'lucide-react';
+import { Command, Plus, Briefcase, LayoutTemplate, MessageSquare, Folders, Settings, Megaphone, Target, DollarSign, Trash2, Hexagon } from 'lucide-react';
 import clsx from 'clsx';
 
 export default function Sidebar() {
@@ -17,7 +17,7 @@ export default function Sidebar() {
         clsx(
             "flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium",
             isActive
-                ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_10px_rgba(6,182,212,0.1)]"
+                ? "bg-white/10 text-white border border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.05)]"
                 : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent"
         );
 
@@ -25,8 +25,8 @@ export default function Sidebar() {
         <div className="w-64 h-full glass-panel flex flex-col pt-6 flex-shrink-0 border-r border-white/10 z-20">
             <div className="px-6 mb-8 flex items-center justify-between cursor-pointer" onClick={() => navigate('/')}>
                 <div className="flex items-center gap-2">
-                    <Sparkles className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold tracking-tight text-white/90">Waymaker</span>
+                    <Hexagon className="w-5 h-5 text-white" />
+                    <span className="text-xl font-serif tracking-tight text-white/90">Waymaker.</span>
                 </div>
             </div>
 
@@ -35,7 +35,7 @@ export default function Sidebar() {
             <div className="px-4 mb-6">
                 <button
                     onClick={handleNewProject}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-primary/80 to-secondary/80 text-white font-semibold hover:from-primary hover:to-secondary transition-all shadow-[0_4px_20px_rgba(6,182,212,0.2)]"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-full bg-white text-black font-semibold hover:bg-slate-200 transition-all shadow-[0_4px_20px_rgba(255,255,255,0.1)]"
                 >
                     <Plus className="w-4 h-4" /> New Project
                 </button>

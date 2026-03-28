@@ -15,6 +15,7 @@ import MyProjects from './pages/MyProjects';
 function App() {
   return (
     <ProjectProvider>
+      <div className="noise-overlay" />
       <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
